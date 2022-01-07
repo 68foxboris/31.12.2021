@@ -601,7 +601,7 @@ std::string convertDVBUTF8(const unsigned char *data, int len, int table, int ts
 			if (table != 11)
 				table = data[i] + 4;
 			++i;
-			eTrace("[convertDVBUTF8] (1..11)text encoded in ISO-8859-%d", table);
+			// eTrace("[convertDVBUTF8] (1..11)text encoded in ISO-8859-%d", table);
 			break;
 		case ISO8859_xx:
 		{

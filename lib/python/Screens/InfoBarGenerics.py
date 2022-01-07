@@ -1450,11 +1450,7 @@ class InfoBarSeek:
 			"unPauseService": (self.unPauseService, _("Continue playback")),
 			"okButton": (self.okButton, _("Continue playback")),
 			"seekFwd": (self.seekFwd, _("Seek forward")),
-			"seekFwdManual": (self.seekFwdManual, _("Seek forward (enter time)")),
 			"seekBack": (self.seekBack, _("Seek backward")),
-			"seekBackManual": (self.seekBackManual, _("Seek backward (enter time)")),
-			"jumpPreviousMark": (self.seekPreviousMark, _("Jump to previous marked position")),
-			"jumpNextMark": (self.seekNextMark, _("Jump to next marked position")),
 		}, prio=-1, description=_("Playback/Seek Actions"))  # give them a little more priority to win over color buttons
 
 		self["SeekActions"].setEnabled(False)
