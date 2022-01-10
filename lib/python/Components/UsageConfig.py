@@ -810,37 +810,6 @@ def InitUsageConfig():
 		config.usage.powerLED = ConfigYesNo(default=True)
 		config.usage.powerLED.addNotifier(powerLEDChanged)
 
-	if SystemInfo["StandbyLED"]:
-		def standbyLEDChanged(configElement):
-			open(SystemInfo["StandbyLED"], "w").write(configElement.value and "on" or "off")
-		config.usage.standbyLED = ConfigYesNo(default=True)
-		if not "fp" in SystemInfo["StandbyLED"]:
-			config.usage.standbyLED.addNotifier(standbyLEDChanged)
-
-	if SystemInfo["PowerLED"] and "fp" in SystemInfo["PowerLED"] and not config.usage.powerLED.value or (SystemInfo["StandbyLED"] and "fp" in SystemInfo["StandbyLED"] and not config.usage.standbyLED.value):
-		config.misc.standbyCounter.addNotifier(standbyCounterChanged, initial_call=False)
-
-	if SystemInfo["SuspendLED"]:
-		def suspendLEDChanged(configElement):
-			if "fp" in SystemInfo["SuspendLED"]:
-				open(SystemInfo["SuspendLED"], "w").write(configElement.value and "1" or "0")
-			else:
-				open(SystemInfo["SuspendLED"], "w").write(configElement.value and "on" or "off")
-		config.usage.suspendLED = ConfigYesNo(default=True)
-		config.usage.suspendLED.addNotifier(suspendLEDChanged)
-
-	if SystemInfo["PowerOffDisplay"]:
-		def powerOffDisplayChanged(configElement):
-			open(SystemInfo["PowerOffDisplay"], "w").write(configElement.value and "1" or "0")
-		config.usage.powerOffDisplay = ConfigYesNo(default=True)
-		config.usage.powerOffDisplay.addNotifier(powerOffDisplayChanged)
-
-	if SystemInfo["LCDshow_symbols"]:
-		def lcdShowSymbols(configElement):
-			open(SystemInfo["LCDshow_symbols"], "w").write(configElement.value and "1" or "0")
-		config.usage.lcd_show_symbols = ConfigYesNo(default=True)
-		config.usage.lcd_show_symbols.addNotifier(lcdShowSymbols)
-
 	if SystemInfo["WakeOnLAN"]:
 		def wakeOnLANChanged(configElement):
 			if "fp" in SystemInfo["WakeOnLAN"]:
