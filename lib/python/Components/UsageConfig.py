@@ -1,20 +1,20 @@
-from Components.Harddisk import harddiskmanager
-from Components.Console import Console
-from config import ConfigSubsection, ConfigYesNo, config, ConfigSelection, ConfigText, ConfigNumber, ConfigSet, ConfigLocations, ConfigSelectionNumber, ConfigClock, ConfigSlider, ConfigEnableDisable, ConfigSubDict, ConfigDictionarySet, ConfigInteger, ConfigPassword, ConfigIP, NoSave, ConfigBoolean
-from Tools.Directories import SCOPE_HDD, SCOPE_TIMESHIFT, defaultRecordingLocation, fileContains, resolveFilename, fileHas
-from enigma import setTunerTypePriorityOrder, setPreferredTuner, setSpinnerOnOff, setEnableTtCachingOnOff, eEnv, eDVBDB, Misc_Options, eBackgroundFileEraser, eServiceEvent, eDVBLocalTimeHandler, eEPGCache, getBoxType
+from locale import AM_STR, PM_STR, nl_langinfo
+from os import mkdir, remove
+from os.path import exists, isfile, islink, join as pathjoin, normpath
+from time import mktime
+
+from enigma import eBackgroundFileEraser, eDVBDB, eEnv, setEnableTtCachingOnOff, setPreferredTuner, setSpinnerOnOff, setTunerTypePriorityOrder, Misc_Options, eServiceEvent, eDVBLocalTimeHandler, eEPGCache
+
+from keyids import KEYIDS
+from skin import parameters
 from Components.About import GetIPsFromNetworkInterfaces
+from Components.config import ConfigBoolean, ConfigClock, ConfigDictionarySet, ConfigEnableDisable, ConfigInteger, ConfigIP, ConfigLocations, ConfigNumber, ConfigPassword, ConfigSelection, ConfigSelectionNumber, ConfigSet, ConfigSlider, ConfigSubDict, ConfigSubsection, ConfigText, ConfigYesNo, NoSave, config
+from Components.Console import Console
+from Components.Harddisk import harddiskmanager
 from Components.NimManager import nimmanager
 from Components.ServiceList import refreshServiceList
-from SystemInfo import SystemInfo
-from os.path import exists, islink, join as pathjoin, normpath
-import os, time, locale, skin
-from boxbranding import getDisplayType, getMachineBuild, getHaveWOL, getSoCFamily
-from keyids import KEYIDS
- 
-model = getBoxType()
-
-displaytype = getDisplayType()
+from Components.SystemInfo import BoxInfo
+from Tools.Directories import SCOPE_HDD, SCOPE_TIMESHIFT, defaultRecordingLocation, fileContains, resolveFilename
 
 
 originalAudioTracks = "orj dos ory org esl qaa und mis mul ORY ORJ Audio_ORJ oth"
@@ -23,14 +23,17 @@ visuallyImpairedCommentary = "NAR qad"
 
 def leaveStandby():
 	if not config.usage.powerLED.value:
-		open(SystemInfo["PowerLED"], "w").write("0")
+		open(BoxInfo.getItem("PowerLED"), "w").write("0")
 
 
 def standbyCounterChanged(dummy):
 	from Screens.Standby import inStandby
 	inStandby.onClose.append(leaveStandby)
 	if not config.usage.standbyLED.value:
-		open(SystemInfo["StandbyLED"], "w").write("0")
+		open(BoxInfo.getItem("StandbyLED"), "w").write("0")
+
+model = BoxInfo.getItem("model")
+displaytype = BoxInfo.getItem("displaytype")
 
 
 def InitUsageConfig():
