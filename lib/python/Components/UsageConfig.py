@@ -374,7 +374,7 @@ def InitUsageConfig():
 
 	if SystemInfo["Fan"]:
 		choicelist = [('off', _("Off")), ('on', _("On")), ('auto', _("Auto"))]
-		if os.path.exists("/proc/stb/fp/fan_choices"):
+		if exists("/proc/stb/fp/fan_choices"):
 			choicelist = [x for x in choicelist if x[0] in open("/proc/stb/fp/fan_choices", "r").read().strip().split(" ")]
 		config.usage.fan = ConfigSelection(choicelist)
 
