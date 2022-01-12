@@ -823,19 +823,19 @@ def InitUsageConfig():
 
 	config.usage.boolean_graphic = ConfigYesNo(default=False)
 
-	if SystemInfo["Fan"]:
+	if BoxInfo.getItem("Fan"):
 		choicelist = [('off', _("Off")), ('on', _("On")), ('auto', _("Auto"))]
 		if exists("/proc/stb/fp/fan_choices"):
 			choicelist = [x for x in choicelist if x[0] in open("/proc/stb/fp/fan_choices", "r").read().strip().split(" ")]
 		config.usage.fan = ConfigSelection(choicelist)
 
 		def fanChanged(configElement):
-			open(SystemInfo["Fan"], "w").write(configElement.value)
+			open(BoxInfo.getItem("Fan"), "w").write(configElement.value)
 		config.usage.fan.addNotifier(fanChanged)
 
-	if SystemInfo["FanPWM"]:
+	if BoxInfo.getItem("FanPWM"):
 		def fanSpeedChanged(configElement):
-			open(SystemInfo["FanPWM"], "w").write(hex(configElement.value)[2:])
+			open(BoxInfo.getItem("FanPWM"), "w").write(hex(configElement.value)[2:])
 		config.usage.fanspeed = ConfigSlider(default=127, increment=8, limits=(0, 255))
 		config.usage.fanspeed.addNotifier(fanSpeedChanged)
 
@@ -850,18 +850,18 @@ def InitUsageConfig():
 		config.usage.powerLED = ConfigYesNo(default=True)
 		config.usage.powerLED.addNotifier(powerLEDChanged)
 
-	if SystemInfo["WakeOnLAN"]:
+	if BoxInfo.getItem("WakeOnLAN"):
 		def wakeOnLANChanged(configElement):
-			if "fp" in SystemInfo["WakeOnLAN"]:
-				open(SystemInfo["WakeOnLAN"], "w").write(configElement.value and "enable" or "disable")
+			if "fp" in BoxInfo.getItem("WakeOnLAN"):
+				open(BoxInfo.getItem("WakeOnLAN"), "w").write(configElement.value and "enable" or "disable")
 			else:
-				open(SystemInfo["WakeOnLAN"], "w").write(configElement.value and "on" or "off")
+				open(BoxInfo.getItem("WakeOnLAN"), "w").write(configElement.value and "on" or "off")
 		config.usage.wakeOnLAN = ConfigYesNo(default=False)
 		config.usage.wakeOnLAN.addNotifier(wakeOnLANChanged)
 
-	if SystemInfo["hasXcoreVFD"]:
+	if BoxInfo.getItem("hasXcoreVFD"):
 		def set12to8characterVFD(configElement):
-			open(SystemInfo["hasXcoreVFD"], "w").write(not configElement.value and "1" or "0")
+			open(BoxInfo.getItem("hasXcoreVFD"), "w").write(not configElement.value and "1" or "0")
 		config.usage.toggle12to8characterVFD = ConfigYesNo(default=False)
 		config.usage.toggle12to8characterVFD.addNotifier(set12to8characterVFD)
 
