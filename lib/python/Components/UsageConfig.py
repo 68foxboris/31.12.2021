@@ -388,17 +388,6 @@ def InitUsageConfig():
 		config.usage.fanspeed = ConfigSlider(default=127, increment=8, limits=(0, 255))
 		config.usage.fanspeed.addNotifier(fanSpeedChanged)
 
-	if SystemInfo["PowerLED"]:
-		def powerLEDChanged(configElement):
-			if "fp" in SystemInfo["PowerLED"]:
-				open(SystemInfo["PowerLED"], "w").write(configElement.value and "1" or "0")
-				patterns = [PATTERN_ON, PATTERN_ON, PATTERN_OFF, PATTERN_OFF] if configElement.value else [PATTERN_OFF, PATTERN_OFF, PATTERN_OFF, PATTERN_OFF]
-				ledPatterns.setLedPatterns(1, patterns)
-			else:
-				open(SystemInfo["PowerLED"], "w").write(configElement.value and "on" or "off")
-		config.usage.powerLED = ConfigYesNo(default=True)
-		config.usage.powerLED.addNotifier(powerLEDChanged)
-
 	if SystemInfo["StandbyLED"]:
 		def standbyLEDChanged(configElement):
 			if "fp" in SystemInfo["StandbyLED"]:
