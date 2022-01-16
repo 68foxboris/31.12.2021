@@ -24,7 +24,15 @@ displaytype = BoxInfo.getItem("displaytype")
 
 originalAudioTracks = "orj dos ory org esl qaa und mis mul ORY ORJ Audio_ORJ oth"
 visuallyImpairedCommentary = "NAR qad"
+def leaveStandby():
+	if not config.usage.powerLED.value:
+		open(BoxInfo.getItem("PowerLED"), "w").write("0")
 
+def standbyCounterChanged(dummy):
+	from Screens.Standby import inStandby
+	inStandby.onClose.append(leaveStandby)
+	if not config.usage.standbyLED.value:
+		open(BoxInfo.getItem("StandbyLED"), "w").write("0")
 
 def InitUsageConfig():
 	config.usage = ConfigSubsection()
@@ -1027,8 +1035,6 @@ def InitUsageConfig():
 		config.usage.time.enabled_display.value = False
 		config.usage.time.display.value = config.usage.time.display.default
 
-	config.usage.boolean_graphic = ConfigYesNo(default=False)
-
 	if BoxInfo.getItem("Fan"):
 		choicelist = [
 			("off", _("Off")),
@@ -1049,17 +1055,6 @@ def InitUsageConfig():
 			open(BoxInfo.getItem("FanPWM"), "w").write(hex(configElement.value)[2:])
 		config.usage.fanspeed = ConfigSlider(default=127, increment=8, limits=(0, 255))
 		config.usage.fanspeed.addNotifier(fanSpeedChanged)
-
-	if SystemInfo["PowerLED"]:
-		def powerLEDChanged(configElement):
-			if "fp" in SystemInfo["PowerLED"]:
-				open(SystemInfo["PowerLED"], "w").write(configElement.value and "1" or "0")
-				patterns = [PATTERN_ON, PATTERN_ON, PATTERN_OFF, PATTERN_OFF] if configElement.value else [PATTERN_OFF, PATTERN_OFF, PATTERN_OFF, PATTERN_OFF]
-				ledPatterns.setLedPatterns(1, patterns)
-			else:
-				open(SystemInfo["PowerLED"], "w").write(configElement.value and "on" or "off")
-		config.usage.powerLED = ConfigYesNo(default=True)
-		config.usage.powerLED.addNotifier(powerLEDChanged)
 
 	if BoxInfo.getItem("WakeOnLAN"):
 		def wakeOnLANChanged(configElement):

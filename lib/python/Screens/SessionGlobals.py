@@ -26,6 +26,21 @@ class SessionGlobals(Screen):
 		self["RecordState"] = RecordState(session)
 		self["Standby"] = Boolean(fixed=False)
 
+		combine = Combine(func=lambda s: {(False, False): 0, (False, True): 1, (True, False): 2, (True, True): 3}[(s[0].boolean, s[1].boolean)])
+		combine.connect(self["Standby"])
+		combine.connect(self["RecordState"])
+
+		#                      |  two leds  | single led |
+		# recordstate  standby   red green
+		#    false      false    off   on     off
+		#    true       false    blnk  on     blnk
+		#    false      true      on   off    off
+		#    true       true     blnk  off    blnk
+
+		PATTERN_ON = (20, 0xffffffff, 0xffffffff)
+		PATTERN_OFF = (20, 0, 0)
+		PATTERN_BLINK = (20, 0x55555555, 0xa7fccf7a)
+
 		NormalLed0 = PATTERN_OFF
 		NormalLed1 = PATTERN_OFF
 		if config.usage.frontled_color.value == "1":
@@ -70,15 +85,17 @@ class SessionGlobals(Screen):
 		if config.usage.frontledrecstdby_color.value == "4":
 			RecstdbyLed1 = PATTERN_BLINK
 
-		nr_leds = SystemInfo.get("NumFrontpanelLEDs", 0)
+		nr_leds = BoxInfo.getItem("NumFrontpanelLEDs", 0)
 
-		if nr_leds > 0:
-			combine = Combine(func=lambda s: {(False, False): 0, (False, True): 1, (True, False): 2, (True, True): 3}[(s[0].boolean, s[1].boolean)])
-			combine.connect(self["Standby"])
-			combine.connect(self["RecordState"])
-
-			if nr_leds == 1:
-				FrontpanelLed(which=0, boolean=False, patterns=[PATTERN_OFF, PATTERN_BLINK, PATTERN_OFF, PATTERN_BLINK]).connect(combine)
-			elif nr_leds == 2:
-				FrontpanelLed(which=0, boolean=False, get_patterns=True).connect(combine)
-				FrontpanelLed(which=1, boolean=False, get_patterns=True).connect(combine)
+		if nr_leds == 1:
+			FrontpanelLed(which=0, boolean=False, patterns=[PATTERN_OFF, PATTERN_BLINK, PATTERN_OFF, PATTERN_BLINK]).connect(combine)
+		elif nr_leds == 2:
+			if BoxInfo.getItem("model") == "dm520":
+				FrontpanelLed(which=0, boolean=False, patterns=[PATTERN_ON, PATTERN_BLINK, PATTERN_OFF, PATTERN_BLINK]).connect(combine)
+				FrontpanelLed(which=1, boolean=False, patterns=[PATTERN_OFF, PATTERN_OFF, PATTERN_OFF, PATTERN_OFF]).connect(combine)
+			elif BoxInfo.getItem("platform") == "dm4kgen":
+				FrontpanelLed(which=0, boolean=False, patterns=[NormalLed0, RecLed0, StandbyLed0, RecstdbyLed0]).connect(combine)
+				FrontpanelLed(which=1, boolean=False, patterns=[NormalLed1, RecLed1, StandbyLed1, RecstdbyLed1]).connect(combine)
+			else:
+				FrontpanelLed(which=0, boolean=False, patterns=[PATTERN_OFF, PATTERN_BLINK, PATTERN_ON, PATTERN_BLINK]).connect(combine)
+				FrontpanelLed(which=1, boolean=False, patterns=[PATTERN_ON, PATTERN_ON, PATTERN_OFF, PATTERN_OFF]).connect(combine)
