@@ -97,6 +97,7 @@
 		<item level="2" text="Show infobar on skip forward/backward" description="When enabled, the infobar will be displayed when skipping forwards/backwards during media playback.">config.usage.show_infobar_on_skip</item>
 		<item level="2" text="Show infobar on event change" description="When enabled, the infobar will be displayed when a new event starts.">config.usage.show_infobar_on_event_change</item>
 		<item level="0" text="Show second infobar" description="Configure whether (and for how long) a second infobar will be shown when OK is pressed twice. The second infobar contains additional information about the current channel.">config.usage.show_second_infobar</item>
+		<item level="0" text="Show event genre information" description="This option allows you to choose whether or not to display genre information for the event.">config.usage.show_genre_info</item>
 		<item level="1" text="Show screensaver" description="Configure the duration in minutes for the screensaver.">config.usage.screen_saver</item>
 		<item level="2" text="Hide zap errors" description="When enabled, error messages related to zapping will not be shown.">config.usage.hide_zap_errors</item>
 		<item level="2" text="Show crypto info in infobar" description="When enabled, encryption info will be shown in the infobar (when supported by the skin).">config.usage.show_cryptoinfo</item>
@@ -122,6 +123,8 @@
 		<item level="2" text="Location EPG Cache file" description="Define the location of the EPG Cache file.">config.misc.epgcache_filename</item>
 		<item level="2" text="Full description separator" description="Configure separator type used in full description for separate short and extended descriptions.">config.epg.fulldescription_separator</item>
 		<item level="2" text="Replace newlines in EPG" description="Select char for replacing newlines in EPG.">config.epg.replace_newlines</item>
+		<item level="2" text="Country for EPG event rating information" description="Choose a country scheme for decoding rating information in EPG events.">config.misc.epgratingcountry</item>
+		<item level="2" text="Country for EPG event genre information" description="Choose a country scheme for decoding genre information in EPG events.">config.misc.epggenrecountry</item>
 	</setup>
 	<setup key="subtitlesetup" title="Subtitle settings">
 		<item level="0" text="Teletext subtitle color" description="Configure the color of the teletext subtitles.">config.subtitles.ttx_subtitle_colors</item>
