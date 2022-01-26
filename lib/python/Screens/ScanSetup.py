@@ -3,7 +3,7 @@ from ServiceScan import ServiceScan
 from Components.config import config, ConfigSubsection, ConfigSelection, ConfigYesNo, ConfigInteger, getConfigListEntry, ConfigSlider, ConfigEnableDisable, ConfigFloat
 from Components.ActionMap import NumberActionMap, ActionMap
 from Components.Sources.StaticText import StaticText
-from Components.SystemInfo import SystemInfo
+from Components.SystemInfo import BoxInfo
 from Components.ConfigList import ConfigListScreen
 from Components.NimManager import nimmanager, getConfigSatlist
 from Components.Label import Label
@@ -11,7 +11,8 @@ from Tools.Transponder import getChannelNumber, supportedChannels, channel2frequ
 from Tools.Directories import fileExists
 from Screens.InfoBar import InfoBar
 from Screens.MessageBox import MessageBox
-from enigma import eTimer, eDVBFrontendParametersSatellite, eComponentScan, eDVBFrontendParametersTerrestrial, eDVBFrontendParametersCable, eConsoleAppContainer, eDVBResourceManager, eDVBFrontendParametersATSC, getBoxType
+from enigma import eTimer, eDVBFrontendParametersSatellite, eComponentScan, eDVBFrontendParametersTerrestrial, eDVBFrontendParametersCable, eConsoleAppContainer, eDVBResourceManager, eDVBFrontendParametersATSC
+brand = BoxInfo.getItem("brand")
 
 
 def buildTerTransponder(frequency,
@@ -288,7 +289,7 @@ class CableTransponderSearchSupport:
 		except:
 			# older API
 			if nim_idx < 2:
-				if HardwareInfo().get_device_name() == "dm500hd":
+				if BoxInfo.getItem("model") == "dm500hd":
 					bus = 2
 				else:
 					bus = nim_idx
