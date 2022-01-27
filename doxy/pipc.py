@@ -1,9 +1,17 @@
-import os, threading, time, socket, select, struct, cbcfg
+from __future__ import absolute_import
+import os
+import threading
+import time
+import socket
+import select
+import struct
+from . import cbcfg
 
-_OPCODE  = {}
+_OPCODE = {}
 _BUFSIZE = 4096
 
 _SOCKETFILE = None
+
 
 def SetHandler(opcode, handler):
     try:
@@ -13,12 +21,14 @@ def SetHandler(opcode, handler):
         return False
     return True
 
+
 def GetHandler(opcode):
     for key, value in _OPCODE.items():
         if value[0] == opcode:
             cbcfg.DEBUG("recv socket: [%s]", key)
             return value[1]
     return None
+
 
 class PServerHandlers:
     def __init__(self, opcode_list, szcbh):
@@ -43,8 +53,10 @@ class PServerHandlers:
                 cbcfg.DEBUG("add handler -> [%s]", opcodestr)
                 SetHandler(opcodestr, fref)
                 registreted_idx += 1
-            except: pass
+            except:
+                pass
         cbcfg.DEBUG("%d handlers registreated.", registreted_idx)
+
 
 class PServerThread(threading.Thread):
     def __init__(self):
@@ -53,7 +65,7 @@ class PServerThread(threading.Thread):
         self.mFlag = False
         self.mTimeout = 5
 
-    def open(self, timeout = 5):
+    def open(self, timeout=5):
         addr = _SOCKETFILE
         self.mTimeout = timeout
         try:
@@ -67,7 +79,7 @@ class PServerThread(threading.Thread):
             self.mSock.settimeout(self.mTimeout)
             self.mSock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             self.mSock.bind(addr)
-        except Exception, err:
+        except Exception as err:
             cbcfg.ERROR("socket() fail : %s", err)
             return False
         return True
@@ -95,10 +107,10 @@ class PServerThread(threading.Thread):
         if length > 0:
             recv_data = conn.recv(length)
 
-        result, send_packet = False,None
+        result, send_packet = False, None
         try:
             result, send_packet = GetHandler(opcode)(result, recv_data)
-        except Exception, err:
+        except Exception as err:
             cbcfg.ERROR(err)
         send_data = self.assamble(opcode, result, send_packet)
         conn.sendall(send_data)
@@ -118,7 +130,7 @@ class PServerThread(threading.Thread):
                     try:
                         conn, addr = self.mSock.accept()
                         self.process(conn, addr)
-                    except Exception, err:
+                    except Exception as err:
                         cbcfg.ERROR("PServerThread: %s", err)
                     finally:
                         if conn is not None:
