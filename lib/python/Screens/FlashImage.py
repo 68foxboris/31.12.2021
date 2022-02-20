@@ -1,29 +1,28 @@
-import json
+from Screens.Screen import Screen
+from Screens.MessageBox import MessageBox
+from Screens.Standby import getReasons
+from Components.Sources.StaticText import StaticText
+from enigma import eEPGCache
+from Components.ChoiceList import ChoiceList, ChoiceEntryComponent
+from Components.config import config, configfile
+from Components.ActionMap import ActionMap
+from Components.Console import Console
+from Components.Label import Label
+from Components.Pixmap import Pixmap
+from Components.ProgressBar import ProgressBar
+from Components.SystemInfo import BoxInfo
+from Tools.BoundFunction import boundFunction
+from Tools.Directories import resolveFilename, SCOPE_PLUGINS
+from Tools.Downloader import downloadWithProgress
+from Tools.Multiboot import getImagelist, getCurrentImage, getCurrentImageMode, deleteImage, restoreImages
 import os
+import urllib2
+import json
+import time
+import zipfile
 import shutil
 import tempfile
 import struct
-import time
-from urllib.request import urlopen
-import zipfile
-
-from enigma import eEPGCache
-
-from Components.ActionMap import ActionMap
-from Components.ChoiceList import ChoiceList, ChoiceEntryComponent
-from Components.config import config, configfile
-from Components.Console import Console
-from Components.Label import Label
-from Components.ProgressBar import ProgressBar
-from Components.SystemInfo import BoxInfo
-from Components.Sources.StaticText import StaticText
-from Screens.MessageBox import MessageBox
-from Screens.Screen import Screen
-from Screens.Standby import getReasons
-from Tools.BoundFunction import boundFunction
-from Tools.Directories import SCOPE_PLUGINS, resolveFilename
-from Tools.Downloader import downloadWithProgress
-from Tools.Multiboot import getImagelist, getCurrentImage, getCurrentImageMode, deleteImage, restoreImages
 
 model = BoxInfo.getItem("model")
 
@@ -35,14 +34,16 @@ def checkimagefiles(files):
 class SelectImage(Screen):
 	def __init__(self, session, *args):
 		Screen.__init__(self, session)
+		self.session = session
 		self.jsonlist = {}
 		self.imagesList = {}
 		self.setIndex = 0
 		self.expanded = []
-		self.setTitle(_("Select image"))
+		self.setTitle(_("Multiboot image selector"))
 		self["key_red"] = StaticText(_("Cancel"))
 		self["key_green"] = StaticText()
 		self["key_yellow"] = StaticText()
+		self["key_blue"] = StaticText()
 		self["description"] = StaticText()
 		self["list"] = ChoiceList(list=[ChoiceEntryComponent('', ((_("Retrieving image list - Please wait...")), "Waiter"))])
 
@@ -84,9 +85,9 @@ class SelectImage(Screen):
 		if not self.imagesList:
 			if not self.jsonlist:
 				try:
-					self.jsonlist = dict(json.load(urlopen('http://downloads.openpli.org/json/%s' % model)))
+					self.jsonlist = dict(json.load(urllib2.urlopen('http://downloads.openpli.org/json/%s' % model)))
 					if config.usage.alternative_imagefeed.value:
-						self.jsonlist.update(dict(json.load(urlopen('%s%s' % (config.usage.alternative_imagefeed.value, model)))))
+						self.jsonlist.update(dict(json.load(urllib2.urlopen('%s%s' % (config.usage.alternative_imagefeed.value, model)))))
 				except:
 					pass
 			self.imagesList = dict(self.jsonlist)
@@ -261,7 +262,6 @@ class FlashImage(Screen):
 					st_dev = os.stat(path).st_dev
 					return (os.major(st_dev), os.minor(st_dev)) in diskstats
 
-				print("[FlashImage] Read /proc/diskstats")
 				diskstats = [(int(x[0]), int(x[1])) for x in [x.split()[0:3] for x in open('/proc/diskstats').readlines()] if x[2].startswith("sd")]
 				if os.path.isdir(path) and checkIfDevice(path, diskstats) and avail(path) > 500:
 					return (path, True)
@@ -322,7 +322,7 @@ class FlashImage(Screen):
 		if retval == 0:
 			self.startDownload()
 		else:
-			self.session.openWithCallback(self.abort, MessageBox, _("Error during backup settings\n%s") % reval, type=MessageBox.TYPE_ERROR, simple=True)
+			self.session.openWithCallback(self.abort, MessageBox, _("Error during backup settings\n%s") % retval, type=MessageBox.TYPE_ERROR, simple=True)
 
 	def startDownload(self, reply=True):
 		self.show()
@@ -409,8 +409,9 @@ class FlashImage(Screen):
 
 class MultibootSelection(SelectImage):
 	def __init__(self, session, *args):
-		SelectImage.__init__(self, session)
-		self.skinName = ["MultibootSelection", "SelectImage"]
+		Screen.__init__(self, session)
+		self.skinName = "SelectImage"
+		self.session = session
 		self.expanded = []
 		self.tmp_dir = None
 		self.setTitle(_("Multiboot image selector"))
@@ -439,7 +440,7 @@ class MultibootSelection(SelectImage):
 
 		self.currentimageslot = getCurrentImage()
 		self.tmp_dir = tempfile.mkdtemp(prefix="MultibootSelection")
-		Console().ePopen('mount %s %s' % (BoxInfo.getItem("MultiBootStartupDevice"), self.tmp_dir))
+		Console().ePopen('mount %s %s' % (BoxInfo.getItem("MultibootStartupDevice"), self.tmp_dir))
 		self.getImagesList()
 
 	def cancel(self, value=None):
@@ -522,7 +523,7 @@ class MultibootSelection(SelectImage):
 
 	def selectionChanged(self):
 		self.currentSelected = self["list"].l.getCurrentSelection()
-		if isinstance(self.currentSelected[0][1], tuple) and self.currentimageslot != self.currentSelected[0][1][0]:
+		if type(self.currentSelected[0][1]) is tuple and self.currentimageslot != self.currentSelected[0][1][0]:
 			self["key_yellow"].setText(_("Delete Image"))
 		elif self.deletedImagesExists:
 			self["key_yellow"].setText(_("Restore deleted images"))
