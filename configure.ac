@@ -641,6 +641,11 @@ CXXFLAGS="$CXXFLAGS -Wall -Wextra \
 	-Wno-error=deprecated-declarations -Wno-error=format-zero-length -Werror=float-equal \
 	$BASE_CFLAGS $ENIGMA2_CFLAGS $PTHREAD_CFLAGS $OPENMP_CFLAGS $ALSA_CFLAGS $GLES_CFLAGS"
 
+ARFLAGS="cr"
+AC_SUBST(ARFLAGS)
+AR_FLAGS="cr"
+AC_SUBST(AR_FLAGS)
+
 AC_CONFIG_FILES([
 Makefile
 data/Makefile
